@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Providers;
 
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
@@ -45,7 +44,6 @@ class AuthServiceProvider extends ServiceProvider
         foreach (get_class_methods(new \App\Policies\GenericEntityPolicy()) as $method) {
             $gate->define($method, "App\Policies\GenericEntityPolicy@{$method}");
         }
-
         $this->registerPolicies($gate);
     }
 }

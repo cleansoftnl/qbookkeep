@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Account;
@@ -20,12 +19,11 @@ class ReportController extends BaseController
     public function d3()
     {
         $message = '';
-        $fileName = storage_path().'/dataviz_sample.txt';
-
+        $fileName = storage_path() . '/dataviz_sample.txt';
         if (Auth::user()->account->hasFeature(FEATURE_REPORTS)) {
             $account = Account::where('id', '=', Auth::user()->account->id)
-                            ->with(['clients.invoices.invoice_items', 'clients.contacts'])
-                            ->first();
+                ->with(['clients.invoices.invoice_items', 'clients.contacts'])
+                ->first();
             $account = $account->hideFieldsForViz();
             $clients = $account->clients;
         } elseif (file_exists($fileName)) {
@@ -34,12 +32,10 @@ class ReportController extends BaseController
         } else {
             $clients = '[]';
         }
-
         $data = [
             'clients' => $clients,
             'message' => $message,
         ];
-
         return View::make('reports.d3', $data);
     }
 
@@ -48,12 +44,10 @@ class ReportController extends BaseController
      */
     public function showReports()
     {
-        if (! Auth::user()->hasPermission('view_all')) {
+        if (!Auth::user()->hasPermission('view_all')) {
             return redirect('/');
         }
-
         $action = Input::get('action');
-
         if (Input::get('report_type')) {
             $reportType = Input::get('report_type');
             $dateField = Input::get('date_field');
@@ -65,7 +59,6 @@ class ReportController extends BaseController
             $startDate = Utils::today(false)->modify('-3 month');
             $endDate = Utils::today(false);
         }
-
         $reportTypes = [
             'activity',
             'aging',
@@ -79,7 +72,6 @@ class ReportController extends BaseController
             'tax_rate',
             'quote',
         ];
-
         $params = [
             'startDate' => $startDate->format('Y-m-d'),
             'endDate' => $endDate->format('Y-m-d'),
@@ -88,7 +80,6 @@ class ReportController extends BaseController
             'title' => trans('texts.charts_and_reports'),
             'account' => Auth::user()->account,
         ];
-
         if (Auth::user()->account->hasFeature(FEATURE_REPORTS)) {
             $isExport = $action == 'export';
             $reportClass = '\\App\\Ninja\\Reports\\' . Str::studly($reportType) . 'Report';
@@ -112,7 +103,6 @@ class ReportController extends BaseController
             $params['reportTotals'] = [];
             $params['report'] = false;
         }
-
         return View::make('reports.chart_builder', $params);
     }
 
@@ -124,22 +114,17 @@ class ReportController extends BaseController
      */
     private function export($reportType, $data, $columns, $totals)
     {
-        if (! Auth::user()->hasPermission('view_all')) {
+        if (!Auth::user()->hasPermission('view_all')) {
             exit;
         }
-
         $output = fopen('php://output', 'w') or Utils::fatalError();
         $date = date('Y-m-d');
-
-        $columns = array_map(function($key, $val) {
+        $columns = array_map(function ($key, $val) {
             return is_array($val) ? $key : $val;
         }, array_keys($columns), $columns);
-
         header('Content-Type:application/csv');
         header("Content-Disposition:attachment;filename={$date}-invoiceninja-{$reportType}-report.csv");
-
         Utils::exportData($output, $data, Utils::trans($columns));
-
         /*
         fwrite($output, trans('texts.totals'));
         foreach ($totals as $currencyId => $fields) {
@@ -158,7 +143,6 @@ class ReportController extends BaseController
             fwrite($output, $csv."\n");
         }
         */
-
         fclose($output);
         exit;
     }

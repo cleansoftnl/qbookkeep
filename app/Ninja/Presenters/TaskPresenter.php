@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Ninja\Presenters;
-
 /**
  * Class TaskPresenter.
  */
@@ -42,32 +40,25 @@ class TaskPresenter extends EntityPresenter
     public function invoiceDescription($account, $showProject)
     {
         $str = '';
-
         if ($showProject && $project = $this->project()) {
             $str .= "## {$project}\n\n";
         }
-
         if ($description = trim($this->entity->description)) {
             $str .= $description . "\n\n";
         }
-
         $parts = json_decode($this->entity->time_log) ?: [];
         $times = [];
-
         foreach ($parts as $part) {
             $start = $part[0];
-            if (count($part) == 1 || ! $part[1]) {
+            if (count($part) == 1 || !$part[1]) {
                 $end = time();
             } else {
                 $end = $part[1];
             }
-
             $start = $account->formatDateTime('@' . intval($start));
             $end = $account->formatTime('@' . intval($end));
-
             $times[] = "### {$start} - {$end}";
         }
-
         return $str . implode("\n", $times);
     }
 }

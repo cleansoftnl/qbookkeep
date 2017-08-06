@@ -2,7 +2,8 @@
 
 use App\Models\User;
 
-class OAuth {
+class OAuth
+{
 
     private $providerInstance;
 
@@ -12,12 +13,10 @@ class OAuth {
 
     public function getProvider($provider)
     {
-        switch ($provider)
-        {
+        switch ($provider) {
             case 'google';
                 $this->providerInstance = new Providers\Google();
                 return $this;
-
             default:
                 return null;
                 break;
@@ -28,10 +27,8 @@ class OAuth {
     {
         $email = null;
         $user = null;
-
-        if($this->providerInstance)
+        if ($this->providerInstance)
             $user = User::where('email', $this->providerInstance->getTokenResponse($token))->first();
-
         if ($user)
             return $user;
         else
@@ -39,6 +36,6 @@ class OAuth {
 
     }
 
-
 }
+
 ?>

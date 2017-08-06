@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Carbon;
@@ -281,32 +280,27 @@ class Client extends EntityModel
     public function addContact($data, $isPrimary = false)
     {
         $publicId = isset($data['public_id']) ? $data['public_id'] : (isset($data['id']) ? $data['id'] : false);
-
         if ($publicId && $publicId != '-1') {
             $contact = Contact::scope($publicId)->firstOrFail();
         } else {
             $contact = Contact::createNew();
             $contact->send_invoice = true;
-
             if (isset($data['contact_key']) && $this->account->account_key == env('NINJA_LICENSE_ACCOUNT_KEY')) {
                 $contact->contact_key = $data['contact_key'];
             } else {
                 $contact->contact_key = strtolower(str_random(RANDOM_KEY_LENGTH));
             }
         }
-
         if ($this->account->isClientPortalPasswordEnabled()) {
-            if (! empty($data['password']) && $data['password'] != '-%unchanged%-') {
+            if (!empty($data['password']) && $data['password'] != '-%unchanged%-') {
                 $contact->password = bcrypt($data['password']);
             } elseif (empty($data['password'])) {
                 $contact->password = null;
             }
         }
-
         $contact->fill($data);
         $contact->is_primary = $isPrimary;
         $contact->email = trim($contact->email);
-
         return $this->contacts()->save($contact);
     }
 
@@ -319,10 +313,8 @@ class Client extends EntityModel
         if ($balanceAdjustment == 0 && $paidToDateAdjustment == 0) {
             return;
         }
-
         $this->balance = $this->balance + $balanceAdjustment;
         $this->paid_to_date = $this->paid_to_date + $paidToDateAdjustment;
-
         $this->save();
     }
 
@@ -340,9 +332,9 @@ class Client extends EntityModel
     public function getTotalCredit()
     {
         return DB::table('credits')
-                ->where('client_id', '=', $this->id)
-                ->whereNull('deleted_at')
-                ->sum('balance');
+            ->where('client_id', '=', $this->id)
+            ->whereNull('deleted_at')
+            ->sum('balance');
     }
 
     /**
@@ -359,8 +351,8 @@ class Client extends EntityModel
     public function getPrimaryContact()
     {
         return $this->contacts()
-                    ->whereIsPrimary(true)
-                    ->first();
+            ->whereIsPrimary(true)
+            ->first();
     }
 
     /**
@@ -371,13 +363,10 @@ class Client extends EntityModel
         if ($this->name) {
             return $this->name;
         }
-
-        if (! count($this->contacts)) {
+        if (!count($this->contacts)) {
             return '';
         }
-
         $contact = $this->contacts[0];
-
         return $contact->getDisplayName();
     }
 
@@ -387,7 +376,6 @@ class Client extends EntityModel
     public function getCityState()
     {
         $swap = $this->country && $this->country->swap_postal_code;
-
         return Utils::cityStateZip($this->city, $this->state, $this->postal_code, $swap);
     }
 
@@ -420,13 +408,11 @@ class Client extends EntityModel
             'postal_code',
             'country_id',
         ];
-
         foreach ($fields as $field) {
             if ($this->$field) {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -448,11 +434,9 @@ class Client extends EntityModel
     public function getGatewayToken()
     {
         $accountGateway = $this->account->getGatewayByType(GATEWAY_TYPE_TOKEN);
-
-        if (! $accountGateway) {
+        if (!$accountGateway) {
             return false;
         }
-
         return AccountGatewayToken::clientAndGateway($this->id, $accountGateway->id)->first();
     }
 
@@ -464,7 +448,6 @@ class Client extends EntityModel
         if ($token = $this->getGatewayToken()) {
             return $token->default_payment_method;
         }
-
         return false;
     }
 
@@ -477,10 +460,8 @@ class Client extends EntityModel
             if ($this->account->auto_bill_on_due_date) {
                 return true;
             }
-
             return $token->autoBillLater();
         }
-
         return false;
     }
 
@@ -500,11 +481,9 @@ class Client extends EntityModel
         if ($this->currency_id) {
             return $this->currency_id;
         }
-
-        if (! $this->account) {
+        if (!$this->account) {
             $this->load('account');
         }
-
         return $this->account->currency_id ?: DEFAULT_CURRENCY;
     }
 
@@ -516,11 +495,9 @@ class Client extends EntityModel
         if ($this->currency) {
             return $this->currency->code;
         }
-
-        if (! $this->account) {
+        if (!$this->account) {
             $this->load('account');
         }
-
         return $this->account->currency ? $this->account->currency->code : 'USD';
     }
 
@@ -575,7 +552,6 @@ Client::creating(function ($client) {
     $client->setNullValues();
     $client->account->incrementCounter($client);
 });
-
 Client::updating(function ($client) {
     $client->setNullValues();
 });

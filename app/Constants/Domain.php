@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Constants;
-
 class Domain
 {
     const INVOICENINJA_COM = 1;
@@ -15,7 +13,6 @@ class Domain
             case static::INVOICE_SERVICES:
                 return 'invoice.services';
         }
-
         return 'invoiceninja.com';
     }
 

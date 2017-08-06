@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Ninja\Datatables;
-
 class EntityDatatable
 {
     public $entityType;
@@ -13,7 +11,6 @@ class EntityDatatable
     {
         $this->isBulkEdit = $isBulkEdit;
         $this->hideClient = $hideClient;
-
         if ($entityType) {
             $this->entityType = $entityType;
         }
@@ -33,12 +30,12 @@ class EntityDatatable
     {
         return [
             [
-                'label' => mtrans($this->entityType, 'archive_'.$this->entityType),
-                'url' => 'javascript:submitForm_'.$this->entityType.'("archive")',
+                'label' => mtrans($this->entityType, 'archive_' . $this->entityType),
+                'url' => 'javascript:submitForm_' . $this->entityType . '("archive")',
             ],
             [
-                'label' => mtrans($this->entityType, 'delete_'.$this->entityType),
-                'url' => 'javascript:submitForm_'.$this->entityType.'("delete")',
+                'label' => mtrans($this->entityType, 'delete_' . $this->entityType),
+                'url' => 'javascript:submitForm_' . $this->entityType . '("delete")',
             ],
         ];
     }
@@ -47,23 +44,19 @@ class EntityDatatable
     {
         $data = [];
         $columns = $this->columns();
-
         if ($this->isBulkEdit) {
             $data[] = 'checkbox';
         }
-
         foreach ($columns as $column) {
             if (count($column) == 3) {
                 // third column is optionally used to determine visibility
-                if (! $column[2]) {
+                if (!$column[2]) {
                     continue;
                 }
             }
             $data[] = $column[0];
         }
-
         $data[] = '';
-
         return $data;
     }
 
@@ -81,13 +74,11 @@ class EntityDatatable
     {
         $columns = $this->columnFields();
         $indices = [];
-
         foreach ($columns as $index => $column) {
             if (in_array($column, $fields)) {
                 $indices[] = $index + 1;
             }
         }
-
         return $indices;
     }
 }

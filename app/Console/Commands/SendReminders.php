@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Console\Commands;
 
 use App\Models\Invoice;
@@ -42,14 +41,13 @@ class SendReminders extends Command
     /**
      * SendReminders constructor.
      *
-     * @param Mailer            $mailer
+     * @param Mailer $mailer
      * @param InvoiceRepository $invoiceRepo
      * @param accountRepository $accountRepo
      */
     public function __construct(Mailer $mailer, InvoiceRepository $invoiceRepo, AccountRepository $accountRepo)
     {
         parent::__construct();
-
         $this->mailer = $mailer;
         $this->invoiceRepo = $invoiceRepo;
         $this->accountRepo = $accountRepo;
@@ -58,23 +56,18 @@ class SendReminders extends Command
     public function fire()
     {
         $this->info(date('Y-m-d') . ' Running SendReminders...');
-
         if ($database = $this->option('database')) {
             config(['database.default' => $database]);
         }
-
         $accounts = $this->accountRepo->findWithReminders();
         $this->info(count($accounts) . ' accounts found');
-
         /** @var \App\Models\Account $account */
         foreach ($accounts as $account) {
-            if (! $account->hasFeature(FEATURE_EMAIL_TEMPLATES_REMINDERS)) {
+            if (!$account->hasFeature(FEATURE_EMAIL_TEMPLATES_REMINDERS)) {
                 continue;
             }
-
             $invoices = $this->invoiceRepo->findNeedingReminding($account);
             $this->info($account->name . ': ' . count($invoices) . ' invoices found');
-
             /** @var Invoice $invoice */
             foreach ($invoices as $invoice) {
                 if ($reminder = $account->getInvoiceReminder($invoice)) {
@@ -83,14 +76,12 @@ class SendReminders extends Command
                 }
             }
         }
-
         $this->info('Done');
-
         if ($errorEmail = env('ERROR_EMAIL')) {
             \Mail::raw('EOM', function ($message) use ($errorEmail, $database) {
                 $message->to($errorEmail)
-                        ->from(CONTACT_EMAIL)
-                        ->subject("SendReminders [{$database}]: Finished successfully");
+                    ->from(CONTACT_EMAIL)
+                    ->subject("SendReminders [{$database}]: Finished successfully");
             });
         }
     }

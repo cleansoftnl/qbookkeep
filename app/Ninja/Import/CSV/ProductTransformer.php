@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Ninja\Import\CSV;
 
 use App\Ninja\Import\BaseTransformer;
@@ -20,7 +19,6 @@ class ProductTransformer extends BaseTransformer
         if (empty($data->product_key)) {
             return false;
         }
-
         return new Item($data, function ($data) {
             return [
                 'product_key' => $this->getString($data, 'product_key'),

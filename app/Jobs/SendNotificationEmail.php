@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Jobs;
 
 use App\Models\Payment;
@@ -47,14 +46,13 @@ class SendNotificationEmail extends Job implements ShouldQueue
 
     /**
      * Create a new job instance.
-
-     * @param UserMailer    $userMailer
+     * @param UserMailer $userMailer
      * @param ContactMailer $contactMailer
-     * @param PushService   $pushService
-     * @param mixed         $user
-     * @param mixed         $invoice
-     * @param mixed         $type
-     * @param mixed         $payment
+     * @param PushService $pushService
+     * @param mixed $user
+     * @param mixed $invoice
+     * @param mixed $type
+     * @param mixed $payment
      */
     public function __construct($user, $invoice, $type, $payment, $notes)
     {
@@ -76,7 +74,6 @@ class SendNotificationEmail extends Job implements ShouldQueue
         if (config('queue.default') !== 'sync') {
             $this->user->account->loadLocalizationSettings();
         }
-
         $userMailer->sendNotification($this->user, $this->invoice, $this->type, $this->payment, $this->notes);
     }
 }

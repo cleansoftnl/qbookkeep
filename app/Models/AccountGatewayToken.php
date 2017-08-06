@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Eloquent;
@@ -57,7 +56,6 @@ class AccountGatewayToken extends Eloquent
         if ($this->default_payment_method) {
             return $this->default_payment_method->requiresDelayedAutoBill();
         }
-
         return false;
     }
 
@@ -72,7 +70,6 @@ class AccountGatewayToken extends Eloquent
     {
         $query->where('client_id', '=', $clientId)
             ->where('account_gateway_id', '=', $accountGatewayId);
-
         return $query;
     }
 
@@ -90,13 +87,11 @@ class AccountGatewayToken extends Eloquent
     public function gatewayLink()
     {
         $accountGateway = $this->account_gateway;
-
         if ($accountGateway->gateway_id == GATEWAY_STRIPE) {
             return "https://dashboard.stripe.com/customers/{$this->token}";
         } elseif ($accountGateway->gateway_id == GATEWAY_BRAINTREE) {
             $merchantId = $accountGateway->getConfigField('merchantId');
             $testMode = $accountGateway->getConfigField('testMode');
-
             return $testMode ? "https://sandbox.braintreegateway.com/merchants/{$merchantId}/customers/{$this->token}" : "https://www.braintreegateway.com/merchants/{$merchantId}/customers/{$this->token}";
         } else {
             return false;

@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Ninja\PaymentDrivers;
-
 class CybersourcePaymentDriver extends BasePaymentDriver
 {
     protected $transactionReferenceParam = 'transaction_uuid';
